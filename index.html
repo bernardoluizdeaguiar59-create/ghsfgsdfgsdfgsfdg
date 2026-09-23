@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Muro de Reclamações de São José (SC)</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="bg-slate-900 text-slate-100 h-full flex flex-col justify-between selection:bg-rose-500 selection:text-white">
+
+    <div id="app" class="flex flex-col min-h-full">
+        
+        <!-- Header -->
+        <header class="bg-slate-800 border-b border-slate-700 sticky top-0 z-40 shadow-md">
+            <div class="max-w-4xl mx-auto px-4 py-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div class="flex items-center gap-3">
+                    <div class="bg-rose-600 text-white p-2.5 rounded-xl shadow-inner flex items-center justify-center">
+                        <i class="fa-solid fa-triangle-exclamation text-xl"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-xl font-bold tracking-tight text-white">Muro de Reclamações</h1>
+                        <p class="text-xs text-slate-400">Fiscalização Cidadã • São José (SC)</p>
+                    </div>
+                </div>
+
+                <!-- Auth Bar / User Info -->
+                <div id="auth-container" class="flex items-center gap-3 w-full sm:w-auto justify-end">
+                    <!-- Dinâmico via JS -->
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Container -->
+        <main class="flex-grow max-w-4xl w-full mx-auto px-4 py-6">
+            
+            <!-- Banner / Info -->
+            <div class="bg-gradient-to-r from-slate-800 to-slate-800/80 border border-slate-700/80 rounded-2xl p-6 mb-6 shadow-xl relative overflow-hidden">
+                <div class="absolute right-0 top-0 translate-x-4 -translate-y-4 w-40 h-40 bg-rose-500/10 rounded-full blur-2xl pointer-events-none"></div>
+                <h2 class="text-lg font-semibold text-white mb-1"><i class="fa-solid fa-bullhorn text-rose-500 mr-2"></i>A sua voz na cidade</h2>
+                <p class="text-sm text-slate-300 leading-relaxed">
+                    Registre problemas de infraestrutura em São José (Barreiros, Kobrasol, Campinas, Areias, etc.). Crie sua conta para enviar publicações visíveis para todos.
+                </p>
+            </div>
+
+            <!-- Action bar & Filters -->
+            <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 mb-6">
+                <div class="flex items-center gap-2">
+                    <span class="text-xs font-semibold uppercase tracking-wider text-slate-400"><i class="fa-solid fa-filter mr-1"></i> Bairro:</span>
+                    <select id="filter-bairro" class="bg-slate-800 border border-slate-700 text-slate-200 text-sm rounded-xl px-3 py-2 outline-none focus:border-rose-500 transition">
+                        <option value="todos">Todos os Bairros</option>
+                        <option value="Barreiros">Barreiros</option>
+                        <option value="Kobrasol">Kobrasol</option>
+                        <option value="Campinas">Campinas</option>
+                        <option value="Areias">Areias</option>
+                        <option value="Ponta de Baixo">Ponta de Baixo</option>
+                        <option value="Forquilhinha">Forquilhinha</option>
+                        <option value="Roçado">Roçado</option>
+                        <option value="Sertão do Maruim">Sertão do Maruim</option>
+                        <option value="Outros">Outros</option>
+                    </select>
+                </div>
+
+                <button id="btn-nova-reclamacao" class="bg-rose-600 hover:bg-rose-500 text-white font-medium px-5 py-2.5 rounded-xl shadow-lg shadow-rose-600/20 transition flex items-center justify-center gap-2 text-sm">
+                    <i class="fa-solid fa-plus-circle"></i> Nova Reclamação
+                </button>
+            </div>
+
+            <!-- Recomendações / Feed List -->
+            <div id="feed-reclamacoes" class="space-y-4">
+                <!-- Conteúdo injetado via JS -->
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="bg-slate-950 border-t border-slate-800 text-center py-4 text-xs text-slate-500">
+            Muro de Reclamações de São José &bull; Dados salvos localmente no navegador
+        </footer>
+    </div>
+
+    <!-- Modal de Autenticação (Login / Cadastro) -->
+    <div id="modal-auth" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-slate-800 border border-slate-700 rounded-2xl max-w-md w-full p-6 shadow-2xl relative">
+            <button onclick="fecharModalAuth()" class="absolute top-4 right-4 text-slate-400 hover:text-white transition">
+                <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+            <div class="text-center mb-6">
+                <div class="bg-rose-500/10 text-rose-500 w-12 h-12 rounded-2xl flex items-center justify-center mx-auto mb-3 border border-rose-500/20">
+                    <i class="fa-solid fa-user-shield text-xl"></i>
+                </div>
+                <h3 id="auth-modal-title" class="text-xl font-bold text-white">Acesse sua Conta</h3>
+                <p class="text-xs text-slate-400 mt-1">É necessário se identificar para publicar no muro</p>
+            </div>
+
+            <form id="form-auth" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-medium text-slate-300 mb-1">Nome de Usuário</label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-500"><i class="fa-solid fa-user"></i></span>
+                        <input type="text" id="auth-username" required placeholder="Digite seu nome de usuário" class="w-full bg-slate-900 border border-slate-700 rounded-xl pl-10 pr-4 py-2.5 text-sm text-slate-100 placeholder-slate-500 outline-none focus:border-rose-500 transition">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-slate-300 mb-1">Senha</label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-500"><i class="fa-solid fa-lock"></i></span>
+                        <input type="password" id="auth-password" required placeholder="••••••••" class="w-full bg-slate-900 border border-slate-700 rounded-xl pl-10 pr-4 py-2.5 text-sm text-slate-100 placeholder-slate-500 outline-none focus:border-rose-500 transition">
+                    </div>
+                </div>
+                <button type="submit" class="w-full bg-rose-600 hover:bg-rose-500 text-white font-medium py-2.5 rounded-xl shadow-lg transition text-sm">
+                    Entrar / Criar Conta automaticamente
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Nova Reclamação -->
+    <div id="modal-reclamacao" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-slate-800 border border-slate-700 rounded-2xl max-w-lg w-full p-6 shadow-2xl relative max-h-[90vh] overflow-y-auto">
+            <button onclick="fecharModalReclamacao()" class="absolute top-4 right-4 text-slate-400 hover:text-white transition">
+                <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+            <div class="mb-5">
+                <h3 class="text-xl font-bold text-white flex items-center gap-2"><i class="fa-solid fa-bullhorn text-rose-500"></i> Nova Reclamação</h3>
+                <p class="text-xs text-slate-400 mt-1">Preencha os dados do problema urbano para expor no muro público.</p>
+            </div>
+
+            <form id="form-reclamacao" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-medium text-slate-300 mb-1">Título da Reclamação</label>
+                    <input type="text" id="rec-titulo" required placeholder="Ex: Buraco imenso na rua principal" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-slate-100 placeholder-slate-500 outline-none focus:border-rose-500 transition">
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-medium text-slate-300 mb-1">Categoria</label>
+                        <select id="rec-categoria" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2.5 text-sm text-slate-100 outline-none focus:border-rose-500 transition">
+                            <option value="Buraco na Via">Buraco na Via</option>
+                            <option value="Falta de Iluminação">Falta de Iluminação</option>
+                            <option value="Lixo Acumulado">Lixo Acumulado</option>
+                            <option value="Bueiro Entupido">Bueiro Entupido</option>
+                            <option value="Calçada Quebrada">Calçada Quebrada</option>
+                            <option value="Outros">Outros</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-slate-300 mb-1">Bairro</label>
+                        <select id="rec-bairro" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2.5 text-sm text-slate-100 outline-none focus:border-rose-500 transition">
+                            <option value="Barreiros">Barreiros</option>
+                            <option value="Kobrasol">Kobrasol</option>
+                            <option value="Campinas">Campinas</option>
+                            <option value="Areias">Areias</option>
+                            <option value="Ponta de Baixo">Ponta de Baixo</option>
+                            <option value="Forquilhinha">Forquilhinha</option>
+                            <option value="Roçado">Roçado</option>
+                            <option value="Sertão do Maruim">Sertão do Maruim</option>
+                            <option value="Outros">Outros</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-medium text-slate-300 mb-1">Endereço / Referência</label>
+                    <input type="text" id="rec-endereco" required placeholder="Ex: Próximo à praça principal, nº 200" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-slate-100 placeholder-slate-500 outline-none focus:border-rose-500 transition">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-medium text-slate-300 mb-1">Descrição Detalhada do Problema</label>
+                    <textarea id="rec-descricao" rows="4" required placeholder="Explique há quanto tempo está assim e os transtornos causados..." class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-slate-100 placeholder-slate-500 outline-none focus:border-rose-500 transition resize-none"></textarea>
+                </div>
+
+                <button type="submit" class="w-full bg-rose-600 hover:bg-rose-500 text-white font-medium py-2.5 rounded-xl shadow-lg transition text-sm">
+                    Publicar Reclamação
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Caixa de Mensagem / Alerta Customizado -->
+    <div id="modal-alerta" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-slate-800 border border-slate-700 rounded-2xl max-w-sm w-full p-6 shadow-2xl text-center">
+            <div id="alerta-icone" class="w-12 h-12 rounded-2xl flex items-center justify-center mx-auto mb-3 text-xl bg-rose-500/10 text-rose-500 border border-rose-500/20">
+                <i class="fa-solid fa-circle-exclamation"></i>
+            </div>
+            <h4 id="alerta-titulo" class="text-lg font-bold text-white mb-2">Aviso</h4>
+            <p id="alerta-mensagem" class="text-xs text-slate-300 mb-6 leading-relaxed">Mensagem de aviso...</p>
+            <button onclick="fecharAlerta()" class="w-full bg-slate-700 hover:bg-slate-600 text-white font-medium py-2 rounded-xl transition text-sm">
+                Entendido
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Chaves do LocalStorage
+        const STORAGE_KEY_USER = 'muro_sj_usuario_atual';
+        const STORAGE_KEY_USERS = 'muro_sj_usuarios_cadastrados';
+        const STORAGE_KEY_RECS = 'muro_sj_reclamacoes';
+
+        // Estado inicial da aplicação
+        let usuarioAtual = JSON.parse(localStorage.getItem(STORAGE_KEY_USER)) || null;
+
+        // Inicialização ao carregar a página
+        window.onload = function() {
+            inicializarFeedSeVazio();
+            atualizarBarraAutenticacao();
+            renderizarFeed();
+
+            // Event listeners
+            document.getElementById('form-auth').addEventListener('submit', lidarComAutenticacao);
+            document.getElementById('form-reclamacao').addEventListener('submit', lidarComCriacaoReclamacao);
+            document.getElementById('filter-bairro').addEventListener('change', renderizarFeed);
+            document.getElementById('btn-nova-reclamacao').addEventListener('click', abrirModalNovaReclamacao);
+        };
+
+        // Garante que o feed inicia completamente vazio (sem posts fakes)
+        function inicializarFeedSeVazio() {
+            if (!localStorage.getItem(STORAGE_KEY_RECS)) {
+                localStorage.setItem(STORAGE_KEY_RECS, JSON.stringify([]));
+            }
+        }
+
+        // Sistema de Alerta Personalizado
+        function mostrarAlerta(titulo, mensagem, tipo = 'erro') {
+            document.getElementById('alerta-titulo').innerText = titulo;
+            document.getElementById('alerta-mensagem').innerText = mensagem;
+            const iconeDiv = document.getElementById('alerta-icone');
+            if (tipo === 'sucesso') {
+                iconeDiv.className = 'w-12 h-12 rounded-2xl flex items-center justify-center mx-auto mb-3 text-xl bg-emerald-500/10 text-emerald-500 border border-emerald-500/20';
+                iconeDiv.innerHTML = '<i class="fa-solid fa-circle-check"></i>';
+            } else {
+                iconeDiv.className = 'w-12 h-12 rounded-2xl flex items-center justify-center mx-auto mb-3 text-xl bg-rose-500/10 text-rose-500 border border-rose-500/20';
+                iconeDiv.innerHTML = '<i class="fa-solid fa-circle-exclamation"></i>';
+            }
+            document.getElementById('modal-alerta').classList.remove('hidden');
+        }
+
+        function fecharAlerta() {
+            document.getElementById('modal-alerta').classList.add('hidden');
+        }
+
+        // Autenticação e Gestão de Usuários
+        function atualizarBarraAutenticacao() {
+            const container = document.getElementById('auth-container');
+            if (usuarioAtual) {
+                // Checagem estrita e secreta no código (sem exibir nada publicamente)
+                const isAdmin = usuarioAtual.username.trim().toLowerCase() === 'bernardo luizz';
+                container.innerHTML = `
+                    <div class="flex items-center gap-2 bg-slate-900 border border-slate-700 px-3 py-1.5 rounded-xl">
+                        <div class="w-7 h-7 rounded-lg ${isAdmin ? 'bg-amber-500 text-slate-950 font-bold' : 'bg-rose-600 text-white'} flex items-center justify-center text-xs">
+                            <i class="fa-solid ${isAdmin ? 'fa-shield-halved' : 'fa-user'}"></i>
+                        </div>
+                        <div class="text-left">
+                            <p class="text-xs font-semibold text-white">${escapeHtml(usuarioAtual.username)}</p>
+                            <p class="text-[10px] ${isAdmin ? 'text-amber-400 font-bold' : 'text-slate-400'}">${isAdmin ? 'Administrador' : 'Usuário padrão'}</p>
+                        </div>
+                    </div>
+                    <button onclick="sairConta()" class="bg-slate-700 hover:bg-slate-600 text-slate-200 text-xs px-3 py-2 rounded-xl transition" title="Sair da conta">
+                        <i class="fa-solid fa-right-from-bracket"></i>
+                    </button>
+                `;
+            } else {
+                container.innerHTML = `
+                    <button onclick="abrirModalAuth()" class="bg-rose-600 hover:bg-rose-500 text-white font-medium px-4 py-2 rounded-xl text-sm transition flex items-center gap-2 shadow-lg shadow-rose-600/20">
+                        <i class="fa-solid fa-user-plus"></i> Entrar / Criar Conta
+                    </button>
+                `;
+            }
+        }
+
+        function abrirModalAuth() {
+            document.getElementById('modal-auth').classList.remove('hidden');
+        }
+
+        function fecharModalAuth() {
+            document.getElementById('modal-auth').classList.add('hidden');
+        }
+
+        function lidarComAutenticacao(e) {
+            e.preventDefault();
+            const usernameInput = document.getElementById('auth-username').value.trim();
+            const senhaInput = document.getElementById('auth-password').value;
+
+            if (!usernameInput) return;
+
+            let usuarios = JSON.parse(localStorage.getItem(STORAGE_KEY_USERS)) || [];
+            let usuarioEncontrado = usuarios.find(u => u.username.toLowerCase() === usernameInput.toLowerCase());
+
+            if (!usuarioEncontrado) {
+                usuarioEncontrado = { username: usernameInput, senha: senhaInput };
+                usuarios.push(usuarioEncontrado);
+                localStorage.setItem(STORAGE_KEY_USERS, JSON.stringify(usuarios));
+                mostrarAlerta('Conta Criada!', `Sua conta "${usernameInput}" foi criada e você já está logado.`, 'sucesso');
+            } else {
+                if (usuarioEncontrado.senha !== senhaInput) {
+                    mostrarAlerta('Senha Incorreta', 'A senha informada não confere com esta conta existente.');
+                    return;
+                }
+                mostrarAlerta('Bem-vindo de volta!', `Login efetuado com sucesso como ${usuarioEncontrado.username}.`, 'sucesso');
+            }
+
+            usuarioAtual = usuarioEncontrado;
+            localStorage.setItem(STORAGE_KEY_USER, JSON.stringify(usuarioAtual));
+            fecharModalAuth();
+            atualizarBarraAutenticacao();
+            renderizarFeed();
+        }
+
+        function sairConta() {
+            usuarioAtual = null;
+            localStorage.removeItem(STORAGE_KEY_USER);
+            atualizarBarraAutenticacao();
+            renderizarFeed();
+            mostrarAlerta('Sessão Encerrada', 'Você saiu da sua conta com sucesso.', 'sucesso');
+        }
+
+        // Criar Reclamação
+        function abrirModalNovaReclamacao() {
+            if (!usuarioAtual) {
+                mostrarAlerta('Atenção', 'Você precisa estar logado com uma conta para enviar reclamações ao muro.');
+                abrirModalAuth();
+                return;
+            }
+            document.getElementById('form-reclamacao').reset();
+            document.getElementById('modal-reclamacao').classList.remove('hidden');
+        }
+
+        function fecharModalReclamacao() {
+            document.getElementById('modal-reclamacao').classList.add('hidden');
+        }
+
+        function lidarComCriacaoReclamacao(e) {
+            e.preventDefault();
+            if (!usuarioAtual) {
+                abrirModalAuth();
+                return;
+            }
+
+            const titulo = document.getElementById('rec-titulo').value.trim();
+            const categoria = document.getElementById('rec-categoria').value;
+            const bairro = document.getElementById('rec-bairro').value;
+            const endereco = document.getElementById('rec-endereco').value.trim();
+            const descricao = document.getElementById('rec-descricao').value.trim();
+
+            const agora = new Date();
+            const dataFormatada = agora.toLocaleDateString('pt-BR') + ' às ' + agora.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+
+            const novaReclamacao = {
+                id: 'rec_' + Date.now() + Math.random().toString(36).substr(2, 5),
+                titulo,
+                categoria,
+                bairro,
+                endereco,
+                descricao,
+                autor: usuarioAtual.username,
+                data: dataFormatada
+            };
+
+            let reclamacoes = JSON.parse(localStorage.getItem(STORAGE_KEY_RECS)) || [];
+            reclamacoes.unshift(novaReclamacao);
+            localStorage.setItem(STORAGE_KEY_RECS, JSON.stringify(reclamacoes));
+
+            fecharModalReclamacao();
+            renderizarFeed();
+            mostrarAlerta('Reclamação Publicada!', 'Sua denúncia já está visível para todos no feed público de São José.', 'sucesso');
+        }
+
+        // Excluir Reclamação (Restrito estritamente aos bastidores para a conta secreta)
+        function excluirReclamacao(id) {
+            if (!usuarioAtual || usuarioAtual.username.trim().toLowerCase() !== 'bernardo luizz') {
+                mostrarAlerta('Acesso Negado', 'Permissão negada.');
+                return;
+            }
+
+            let reclamacoes = JSON.parse(localStorage.getItem(STORAGE_KEY_RECS)) || [];
+            reclamacoes = reclamacoes.filter(r => r.id !== id);
+            localStorage.setItem(STORAGE_KEY_RECS, JSON.stringify(reclamacoes));
+            renderizarFeed();
+            mostrarAlerta('Reclamação Removida', 'A publicação foi excluída pelo administrador.', 'sucesso');
+        }
+
+        // Renderização do Feed Público
+        function renderizarFeed() {
+            const feedContainer = document.getElementById('feed-reclamacoes');
+            const filtroBairro = document.getElementById('filter-bairro').value;
+            const reclamacoes = JSON.parse(localStorage.getItem(STORAGE_KEY_RECS)) || [];
+
+            const filtradas = reclamacoes.filter(rec => {
+                if (filtroBairro !== 'todos' && rec.bairro !== filtroBairro) return false;
+                return true;
+            });
+
+            if (filtradas.length === 0) {
+                feedContainer.innerHTML = `
+                    <div class="bg-slate-800/50 border border-slate-700 rounded-2xl p-10 text-center">
+                        <div class="text-slate-500 text-3xl mb-3"><i class="fa-solid fa-folder-open"></i></div>
+                        <h4 class="text-slate-300 font-medium">Nenhuma reclamação registrada ainda</h4>
+                        <p class="text-xs text-slate-500 mt-1">Seja o primeiro a relatar um problema nesta região de São José.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const isAdmin = usuarioAtual && (usuarioAtual.username.trim().toLowerCase() === 'bernardo luizz');
+
+            feedContainer.innerHTML = filtradas.map(rec => {
+                let iconeCat = 'fa-triangle-exclamation';
+                if (rec.categoria === 'Buraco na Via') iconeCat = 'fa-road';
+                else if (rec.categoria === 'Falta de Iluminação') iconeCat = 'fa-lightbulb';
+                else if (rec.categoria === 'Lixo Acumulado') iconeCat = 'fa-trash';
+                else if (rec.categoria === 'Bueiro Entupido') iconeCat = 'fa-water';
+                else if (rec.categoria === 'Calçada Quebrada') iconeCat = 'fa-person-walking';
+
+                return `
+                    <div class="bg-slate-800 border border-slate-700/80 rounded-2xl p-5 shadow-lg relative transition hover:border-slate-600">
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3 pb-3 border-b border-slate-700/60">
+                            <div class="flex items-center gap-2">
+                                <span class="bg-rose-500/10 text-rose-400 border border-rose-500/20 text-xs px-2.5 py-1 rounded-lg font-medium flex items-center gap-1.5">
+                                    <i class="fa-solid ${iconeCat}"></i> ${escapeHtml(rec.categoria)}
+                                </span>
+                                <span class="bg-slate-700 text-slate-300 text-xs px-2.5 py-1 rounded-lg font-medium">
+                                    <i class="fa-solid fa-location-dot mr-1 text-rose-500"></i> ${escapeHtml(rec.bairro)}
+                                </span>
+                            </div>
+                            <div class="text-xs text-slate-400 flex items-center gap-1">
+                                <i class="fa-regular fa-clock"></i> ${escapeHtml(rec.data)}
+                            </div>
+                        </div>
+
+                        <h3 class="text-base font-bold text-white mb-2">${escapeHtml(rec.titulo)}</h3>
+                        <p class="text-sm text-slate-300 mb-4 whitespace-pre-line leading-relaxed">${escapeHtml(rec.descricao)}</p>
+
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-3 border-t border-slate-700/40 text-xs">
+                            <div class="text-slate-400 flex items-center gap-1.5">
+                                <i class="fa-solid fa-user-circle text-slate-500 text-sm"></i> 
+                                Publicado por: <strong class="text-slate-200">${escapeHtml(rec.autor)}</strong>
+                            </div>
+                            <div class="text-slate-400 flex items-center gap-1.5">
+                                <i class="fa-solid fa-map-pin text-rose-500"></i> ${escapeHtml(rec.endereco)}
+                            </div>
+                        </div>
+
+                        ${isAdmin ? `
+                            <div class="mt-4 pt-3 border-t border-amber-500/20 bg-amber-500/5 -mx-5 -mb-5 p-3 rounded-b-2xl flex items-center justify-between">
+                                <span class="text-[11px] text-amber-400 font-medium"><i class="fa-solid fa-shield-halved mr-1"></i> Painel de Administração</span>
+                                <button onclick="excluirReclamacao('${rec.id}')" class="bg-rose-600 hover:bg-rose-500 text-white px-3 py-1.5 rounded-lg text-xs font-medium transition flex items-center gap-1 shadow">
+                                    <i class="fa-solid fa-trash-can"></i> Excluir Publicação
+                                </button>
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function escapeHtml(text) {
+            if (!text) return '';
+            return text
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+    </script>
+</body>
+</html>
